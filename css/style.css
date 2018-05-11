@@ -1,0 +1,8 @@
+* {}
+
+.logs p {font-size: 14px; color: #aaa;margin: 0;}
+.logs p span {font-size: 16px;color: #000; }
+
+@media (max-width: 767px)  {
+
+}
