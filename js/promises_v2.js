@@ -79,15 +79,9 @@ function onBtnClick() {
          })
         .then(() => { // Потом выводим инфо-собщение
             console.log('Шаг между резолвом и реджектом. Сюда мы попадаем ТОЛЬКО когда у нас резолв');
-            setTimeout(function () {
-                console.log('подождём 2 секунды')
-                shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
-                    ') внутри сет ТаймАут <span>Подождём 2 секунды</span> (Денег осталось - ' + money + ')</p>'
-                );
-            }, 2000)
-            // shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
-            //     ') Последний then перед catch <span>Жизнь идёт своим чередом, всё хорошо...</span> (Денег пока еще - ' + money + ')</p>'
-            // );
+            shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
+                ') Последний then перед catch <span>Жизнь идёт своим чередом, всё хорошо...</span> (Денег пока еще - ' + money + ')</p>'
+            );
         })
         .catch(reject => { // Ловим ошибки если есть
             shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
