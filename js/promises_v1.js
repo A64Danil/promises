@@ -12,29 +12,56 @@ function buyTicket(count) {
     console.log('Внутри buyTicket');
     var thisPromiseCount = count;
     sumka.textContent = money;
+    var action = function () {
 
-    if (money >= 35) {
-        window.setTimeout( function () {
-            shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
-                ') Внутри buyTicket <span>Деньги есть, покупаем билет</span> (Денег осталось - ' + money + ')</p>'
-            );
-            money = money - 35;
-            sumka.textContent = money;
-            shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
-                ') Внутри buyTicket <span>Билет куплен успешно!</span> (Денег осталось - ' + money + ')</p>'
-            );
-        }, Math.random() * 2000 + 1000);
+        return new Promise((resolve, reject) => {
+                window.setTimeout(function () {
+                    if (money >= 35) {
+                        resolve('Деньги есть, покупаем билет')
+                    }
+                    else {
+                        reject('У вас не хватает денег')
+                    }
+                }
+                , Math.random() * 2000 + 1000);
 
+    })
     }
-    else {
-        throw ('У вас не хватает денег');
-    }
+
+    action()
+        .then(resolve => {
+        console.log(resolve);
+    shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
+        ') На самом деле тут создаётся новый промис. Попробуем от него избавиться.</p>'
+    );
+    shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
+        ') Внутри buyTicket <span>' + resolve + '</span> (Денег осталось - ' + money + ')</p>'
+    );
+})
+.then(() => {
+        money = money - 35;
+    shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
+        ') Последний then внутри buyTicket<span>Билет куплен успешно! </span> (Денег осталось - ' + money + ')</p>'
+    );
+})
+.catch(reject => {
+        console.log(reject);
+    shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
+        ') Последний buyTicket  cath <span>' + reject + '</span> (Денег осталось - ' + money + ')</p>'
+    );
+})
+.then(() => {
+        sumka.textContent = money;
+})
+
 
 }
 
 function onBtnClick() {
     var shower = document.getElementById('shower');
 
+    money = money - 5;
+    sumka.textContent = money;
 
     var thisPromiseCount = ++counter;
     shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
@@ -44,61 +71,53 @@ function onBtnClick() {
     var number = Math.random().toFixed(1);
     console.log(number);
     var ticket = function () {
-        money = money - 5;
-        sumka.textContent = money;
         shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
             ') Создали промис <span>Пришли на вокзал</span> (Денег осталось - ' + money + ')</p>'
         );
 
         return new Promise((resolve, reject) => {
-            money <= 0 ? reject('У вас нет денег') : sumka.textContent = money;
 
-            if (number > 0.3) {
-                resolve('Вы пришли вовремя. Пытаемся купить, подождите')
-            }
-            else {
-                reject('Сейчас обед. Приходите позже')
-            }
-        })
+                if (number > 0.5) {
+            //resolve('Деньги есть, покупаем билет')
+            resolve('Вы пришли вовремя. Пытаемся купить, подождите')
+        }
+        else {
+            //reject('У вас не хватает денег')
+            reject('Сейчас обед. Приходите позже')
+        }
+    })
     };
 
-    ticket()  // Если пришли во время, то...
-        .then(resolve => { // Потом выводим инфо-собщение
-            shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
-                ') Первый then <span>' + resolve + '</span> (Денег пока еще - ' + money + ')</p>'
-            );
-            return thisPromiseCount;
-        })
-        .then((thisPromiseCount ) => { // Потом пытаемся купить билет
-            buyTicket(thisPromiseCount);
-         })
-        .then(() => { // Потом выводим инфо-собщение
-            shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
-                ') После buyTicket <span>Ждём</span> (Денег осталось - ' + money + ')</p>'
-            );
-         })
-        .then(() => { // Потом выводим инфо-собщение
-            console.log('Шаг между резолвом и реджектом. Сюда мы попадаем ТОЛЬКО когда у нас резолв');
-            shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
-                ') Последний then перед catch <span>Жизнь идёт своим чередом, всё хорошо...</span> (Денег пока еще - ' + money + ')</p>'
-            );
-        })
-        .catch(reject => { // Ловим ошибки если есть
-            shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
-                ') Последний cath <span>' + reject + '</span> (Денег осталось - ' + money + ')</p>'
-            );
-        })
-        .then(() => { // Потом выводим инфо-собщение
-        // TODO: сделать такую асинхронность чтобы этот пункт всегда был последним
-            shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
-                ') Последний then в цепочке <span>Этот пункт всегда должен идти последним</span> (Денег пока еще - ' + money + ')</p>'
-            );
-        })
+    ticket()
+        .then(resolve => {
+        console.log(resolve);
+    shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
+        ') Первый then <span>' + resolve + '</span> (Денег пока еще - ' + money + ')</p>'
+    );
+    return thisPromiseCount;
+})
+.then((thisPromiseCount ) => {
+        buyTicket(thisPromiseCount);
+})
+.then(() => {
+        console.log('Шаг между резолвом и реджектом. Сюда мы попадаем ТОЛЬКО когда у нас резолв');
+    shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
+        ') Последний then <span>Жизнь идёт своим чередом, всё хорошо...</span> (Денег пока еще - ' + money + ')</p>'
+    );
+})
+.catch(reject => {
+        console.log(reject);
+    shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
+        ') Последний cath <span>' + reject + '</span> (Денег осталось - ' + money + ')</p>'
+    );
+})
 
 
 }
 
+
 button.addEventListener('click', onBtnClick);
+
 
 
 var promiseCount = 0;
@@ -142,7 +161,7 @@ function testPromise() {
             log.insertAdjacentHTML('beforeend', val +
                 ') Обещание отклонено (асинхронный код завершён)<br>');
         },
-        );
+    );
 
     log.insertAdjacentHTML('beforeend', thisPromiseCount +
         ') Обещание создано (синхронный код завершён)<br>');
