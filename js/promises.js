@@ -3,17 +3,31 @@
  */
 console.log('Node js working. Тест русских символов')
 
-var money = 100;
+button.addEventListener('click', onBtnClick);
+
+var money = 400;
 var counter = 0;
 
 sumka.textContent = money;
 
+var isPress = 0;
+function btnCheker() {
+    if (isPress == 0) {
+        isPress = 1;
+    }
+    else {
+        alert('вы уже нажали на кнопку, ждите!')
+        return false;
+    }
+} // Reject double press on button
+
 function buyTicket(count) {
-    console.log('Внутри buyTicket');
     var thisPromiseCount = count;
     sumka.textContent = money;
 
     if (money >= 35) {
+        showLoader(); // <==== Запускаем наш лоадер снова
+
         window.setTimeout( function () {
             shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
                 ') Внутри buyTicket <span>Деньги есть, покупаем билет</span> (Денег осталось - ' + money + ')</p>'
@@ -34,7 +48,9 @@ function buyTicket(count) {
 
 function onBtnClick() {
     var shower = document.getElementById('shower');
-
+    if (btnCheker() == false) {
+        return;
+    }
 
     var thisPromiseCount = ++counter;
     shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
@@ -44,14 +60,16 @@ function onBtnClick() {
     var number = Math.random().toFixed(1);
     console.log(number);
     var ticket = function () {
-        money = money - 5;
-        sumka.textContent = money;
-        shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
-            ') Создали промис <span>Пришли на вокзал</span> (Денег осталось - ' + money + ')</p>'
-        );
 
-        return new Promise((resolve, reject) => {
-            money <= 0 ? reject('У вас нет денег') : sumka.textContent = money;
+        if (money >= 5 ) {
+            money-= 5;
+            // Main part - creating of promise
+            return new Promise((resolve, reject) => {
+                money <= 0 ? reject('У вас нет денег') : sumka.textContent = money;
+            sumka.textContent = money;
+            shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
+                ') Создали промис <span>Пришли на вокзал</span> (Денег осталось - ' + money + ')</p>'
+            );
 
             if (number > 0.3) {
                 resolve('Вы пришли вовремя. Пытаемся купить, подождите')
@@ -60,10 +78,18 @@ function onBtnClick() {
                 reject('Сейчас обед. Приходите позже')
             }
         })
+        }
+        else {
+            shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
+                ') промис не создан <span>У вас нет денег</span> (Денег - ' + money + ')' +
+                '<br> Перезагрузите страницу, чтобы попробовать снова.</p>'
+            );
+            isPress = 0;
+        }
+
     };
 
     var loadCheker;
-
 
     ticket()  // Если пришли во время, то...
         .then(resolve => { // Потом выводим инфо-собщение
@@ -85,13 +111,9 @@ function onBtnClick() {
             shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
                 ') перед сет ТаймАут <span>Вот и пришла наша очередь!</span> (Денег осталось - ' + money + ')</p>'
             );
-            console.log('подождём 2 секунды')
             setTimeout(function () {
                 loadCheker = true;
-            }, 3200)
-            // shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
-            //     ') Последний then перед catch <span>Жизнь идёт своим чередом, всё хорошо...</span> (Денег пока еще - ' + money + ')</p>'
-            // );
+            }, 2000)
         })
         .catch(reject => { // Ловим ошибки если есть
             shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
@@ -110,6 +132,8 @@ function onBtnClick() {
                     timerId = setTimeout(tick, 2000);
                 }
                 else {
+                    removeLoader();
+                    isPress = 0;
                     console.log( 'загрузилось, не запускаем новые проверки' );
                     shower.insertAdjacentHTML('beforeend', '<p>' + thisPromiseCount +
                         ') Последний then в цепочке <span>Вы уходите домой</span> (Денег осталось - ' + money + ')' +
@@ -125,10 +149,9 @@ function onBtnClick() {
 
 }
 
-button.addEventListener('click', onBtnClick);
-
-
 var promiseCount = 0;
+
+
 function testPromise() {
     var thisPromiseCount = ++promiseCount;
 
